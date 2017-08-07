@@ -89,7 +89,7 @@ def plots(ims, figsize=(12,6), rows=1, interp=False, titles=None):
         if titles is not None:
             sp.set_title(titles[i], fontsize=16)
         plt.imshow(ims[i], interpolation=None if interp else 'none')
-
+        #print('Image: {}'.format(titles[i]))
 
 def do_clip(arr, mx):
     clipped = np.clip(arr, (1-mx)/1, mx)

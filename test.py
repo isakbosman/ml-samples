@@ -24,7 +24,7 @@ from keras.layers.convolutional import Convolution2D, MaxPooling2D, ZeroPadding2
 from keras.optimizers import SGD, RMSprop
 from keras.preprocessing import image
 
-import csv
+
 
 FILES_PATH = 'http://files.fast.ai/models/'; CLASS_FILES='imagenet_class_index.json'
 fpath = get_file(CLASS_FILES, FILES_PATH+CLASS_FILES, cache_subdir='models')
@@ -79,42 +79,24 @@ def pred_batch(imgs):
         idx = idxs[i]
         print('   {:.4f}/{}'.format(preds[i, idx], classes[idx]))
 
-batch_size = 64
-path = '../../fastai/deeplearning1/nbs/data/dogscats/'
+batch_size = 4
+path = '../fastai/deeplearning1/nbs/data/dogscats/'
 
 def get_batches(dirname, gen=image.ImageDataGenerator(), shuffle=True, 
                 batch_size=batch_size, class_mode='categorical'):
     return gen.flow_from_directory(path+dirname, target_size=(224,224), 
                 class_mode=class_mode, shuffle=shuffle, batch_size=batch_size)
 
-def get_data(path, target_size=(224,224)):
-    batches = get_batches(path, shuffle=False, batch_size=10, class_mode=None)
-    return np.concatenate([batches.next() for i in range(batches.nb_sample)])
-
-
-def write_sub(labels):
-    with open('data.csv', 'wb') as csvfile:
-        wr = csv.writer(csvfile, delimiter=',',
-                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        wr.writerow(['id','label'])
-        for i in range(len(labels)):
-            label = labels[i]
-            wr.writerow([i+1, ''.join([str(int(label[0])),'.', str(int(label[1]))])])
-            #print('Label: {}'.format(label[0]))
-   
 model = VGG_16()
 fpath = get_file('vgg16.h5', FILES_PATH+'vgg16.h5', cache_subdir='models')
 model.load_weights(fpath)
 
 batches = get_batches('train', batch_size=batch_size)
-val_batches = get_data('valid')
-imgs, labels = val_batches #next(batches)
+val_batches = get_batches('valid', batch_size=batch_size)
+imgs, labels = next(batches)
 
 plots(imgs, titles=labels)
 
-#pred_batch(imgs)
-write_sub(labels)
-
-
+pred_batch(imgs)
 
 
